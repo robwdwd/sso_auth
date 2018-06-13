@@ -1,0 +1,33 @@
+{
+    "company": "SSO R Us",
+    "logo": "https://www.example.com/logo.jpg",
+    "title": "Single Sign On",
+    "session": {
+        "key": "OogiDael0looT9pheiGh1rac",
+        "name": "auth_sso"
+    },
+    "paths": {
+        "filesystem": "/var/www/sso/auth",
+        "urlpath": "/auth/",
+        "url": "http://example.com:8181/auth/"
+    }
+    "auth_providers": {
+        "order": ["radius"],
+        "servers": {
+            "radius": {
+                "10.1.1.1": {
+                    "port": 1812,
+                    "secret": "secret",
+                    "timeout": 5,
+                    "max_tries": 3
+                },
+                "10.1.1.2": {
+                    "port": 1812,
+                    "secret": "secret",
+                    "timeout": 5,
+                    "max_tries": 3
+                }
+            }
+        }
+    }
+}
