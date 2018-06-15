@@ -1,13 +1,35 @@
 <?php
 include('includes/setup.php');
 
-$auth = new SSOAuth\Auth($configuration['session']['key'], $configuration['session']['name']);
+$auth = new SSOAuth\Auth(
+    $configuration['session']['key'],
+    $configuration['session']['name'],
+    $configuration['session']['domain'],
+    $configuration['session']['path'],
+    $configuration['session']['idletime'],
+    $configuration['session']['lifetime'],
+    $configuration['session']['secure']
+);
 
 if ($auth->checkLogin()) {
-    header('Location: ' . $_SERVER['HTTP_X_TARGET']);
+    // if the user comes to the login page from another page go there.
+    if (isset($_SERVER['HTTP_X_TARGET']) && !empty($_SERVER['HTTP_X_TARGET'])) {
+        if ($_SERVER['HTTP_X_TARGET'] !== $configuration['paths']['loginurl']) {
+            header('Location: ' . $_SERVER['HTTP_X_TARGET']);
+            exit();
+        }
+    }
+
+    // User has come to the login page directly, display success.
+    //
+    $twig_var_arr['logouturl'] = $configuration['paths']['logouturl'];
+    $template = $twig->loadTemplate('loggedin.tpl');
+    echo $template->render($twig_var_arr);
     exit();
 }
 
+// Add all the radius servers
+//
 foreach ($configuration['auth_providers']['radius']['servers'] as $hostname => $server) {
     $auth->addRadiusServer($hostname, $server['port'], $server['secret'], $server['timeout'], $server['max_tries']);
 }
@@ -23,9 +45,15 @@ if (isset($_POST['username'])) {
     $twig_var_arr['found_error'] = false;
 
     // Check the form Token is valid
-    if ($_POST[$form_token_key] != $_SESSION[$form_token_key]) {
-        $errors[] = "Invalid form submission: Tokens don't match";
+    if (!isset($_SESSION[$form_token_key])) {
+        $errors[] = "Form token not found, did you load the login page in another tab?";
         $found_error = true;
+    } else {
+        // Check the form Token is valid
+        if ($_POST[$form_token_key] !== $_SESSION[$form_token_key]) {
+            $errors[] = "Invalid form submission: Tokens don't match";
+            $found_error = true;
+        }
     }
 
     // Check all fields have been filled in correctly
@@ -59,6 +87,14 @@ if (session_status() == PHP_SESSION_ACTIVE) {
 }
 
 session_name($configuration['session']['name']);
+session_set_cookie_params(
+    $configuration['session']['lifetime'],
+    $configuration['session']['path'],
+    $configuration['session']['domain'],
+    $configuration['session']['secure']
+);
+
+
 session_start();
 
 // Set a form Token

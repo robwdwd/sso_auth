@@ -9,23 +9,36 @@ class Auth
 
     private $session_encryption_key;
     private $session_name;
-    private $session_timeout;
-
-    private $auth_providers = array ('order' => array ('radius'), 'servers' => array('radius' => array()));
+    private $session_lifetime;
+    private $session_domain;
+    private $session_path;
+    private $session_secure;
 
     private $valid_providers = array('radius');
+    private $auth_providers = array ('order' => array ('radius'), 'radius' => array('servers' => array()));
 
     private $has_error = false;
     private $error_message;
 
     private $attributes;
 
+    function __construct(
+        $session_encryption_key = 'eaChey8quoo1ahch0en9eebe',
+        $session_name = 'ssoauth',
+        $session_domain = '',
+        $session_path = '/',
+        $session_idletime = 3600,
+        $session_lifetime = 0,
+        $session_secure = false
+    ) {
 
-    function __construct($session_encryption_key = 'eaChey8quoo1ahch0en9eebe', $session_name = 'ssoauth', $session_timeout = 3600)
-    {
         $this->session_encryption_key = $session_encryption_key;
         $this->session_name = $session_name;
-        $this->session_timeout = $session_timeout;
+        $this->session_domain = $session_domain;
+        $this->session_path = $session_path;
+        $this->session_secure = $session_secure;
+        $this->session_lifetime = $session_lifetime;
+        $this->session_idletime = $session_idletime;
     }
 
     public function hasError()
@@ -44,7 +57,7 @@ class Auth
         // Try the providers/servers in order of preference.
         //
         foreach ($this->auth_providers['order'] as $provider) {
-            if (!isset($this->auth_providers['servers'][$provider]) || empty($this->auth_providers['servers'][$provider])) {
+            if (!isset($this->auth_providers[$provider]['servers']) || empty($this->auth_providers[$provider]['servers'])) {
                  $this->has_error = true;
                  $this->error_message = 'No servers found for provider: ' . $provider;
                  return false;
@@ -60,7 +73,7 @@ class Auth
             }
         }
 
-        return $FALSE;
+        return false;
     }
 
     public function logout()
@@ -87,16 +100,26 @@ class Auth
 
     public function checkLogin()
     {
-
+        // Make sure we save to files and set up encryption on the sessions files.
         ini_set('session.save_handler', 'files');
         $handler = new EncryptedSessionHandler($this->session_encryption_key);
         session_set_save_handler($handler, true);
+
+        // Set session name and set up the session cookie values.
         session_name($this->session_name);
+        session_set_cookie_params($this->session_lifetime, $this->session_path, $this->session_domain, $this->session_secure);
+
+        // Start the Session.
         session_start();
 
+        // Check session says we are logged in.
+        //
         if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']) {
+            // Compare the signature on the session.
             if (isset($_SESSION['signature']) && $this->compareSignature()) {
-                if ((isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] < $this->session_timeout))) {
+                // Make sure the idle time has not expired.
+                if ((isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] < $this->session_idletime))) {
+                    // Update activity time.
                     $_SESSION['LAST_ACTIVITY'] = time();
                     return true;
                 }
@@ -108,6 +131,8 @@ class Auth
 
     public function getIp()
     {
+        // Check IP address either in X-Forward-For or Remote-Addr
+        //
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) === true) {
             return $_SERVER['HTTP_X_FORWARDED_FOR'];
         }
@@ -117,6 +142,13 @@ class Auth
         return '(unknown_ip_address)';
     }
 
+    // Generate form tokens, if a user loads a login page
+    // from multiple hosts (and sessions are for a domain or subdomain)
+    // the last page opened will be the only valid login page as the 
+    // session is destroyed on login.php so the tokens won't match on 
+    // previously opened pages. Where a session is tied to a host all 
+    // loaded login pages will remain valid.
+    // 
     public function getFormTokenKey()
     {
         return md5($_SERVER['PHP_SELF']);
@@ -176,12 +208,11 @@ class Auth
 
     public function addRadiusServer($hostname, $port = 1812, $secret = 'secret', $timeout = 5, $max_tries = 3)
     {
-        $this->auth_providers['servers']['radius'][$hostname] = array ('port' => $port, 'secret' => $secret, 'timeout' => $timeout, 'max_tries' => $max_tries);
+        $this->auth_providers['radius']['servers'][$hostname] = array ('port' => $port, 'secret' => $secret, 'timeout' => $timeout, 'max_tries' => $max_tries);
     }
 
     private function loginSuccess($username)
     {
-
         session_regenerate_id();
         $_SESSION['username'] = $username;
         $_SESSION['logged_in'] = true;
@@ -201,9 +232,9 @@ class Auth
         }
     }
 
-    private function getRadiusAttr($radius) {
+    private function getRadiusAttr($radius)
+    {
         while ($resa = radius_get_attr($radius)) {
-
             if (!is_array($resa)) {
                 return false;
             }
@@ -227,7 +258,7 @@ class Auth
 
         $radius = radius_auth_open();
 
-        foreach ($this->auth_providers['servers']['radius'] as $hostname => $server) {
+        foreach ($this->auth_providers['radius']['servers'] as $hostname => $server) {
             radius_add_server($radius, $hostname, $server['port'], $server['secret'], $server['timeout'], $server['max_tries']);
         }
 

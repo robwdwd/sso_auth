@@ -2,15 +2,25 @@
     "company": "SSO R Us",
     "logo": "https://www.example.com/logo.jpg",
     "title": "Single Sign On",
-    "session": {
-        "key": "OogiDael0looT9pheiGh1rac",
-        "name": "auth_sso"
-    },
     "paths": {
         "filesystem": "/var/www/sso/auth",
         "urlpath": "/auth/",
+        "loginurl": "/auth/login",
+        "logouturl": "/auth/logout",
         "url": "http://example.com:8181/auth/"
-    }
+    },
+    "session": {
+        "key": "OogiDael0looT9pheiGh1rac",
+        "name": "auth_sso",
+        "domain": "example.com",
+        "path": "/",
+        "lifetime": 0,
+        "idletime": 3600,
+        "secure": 1
+    },
+    "headers": {
+        "user": "X-Forwarded-User"
+    },
     "auth_providers": {
         "order": ["radius"],
         "radius": {

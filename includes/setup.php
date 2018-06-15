@@ -1,5 +1,6 @@
 <?php
 
+
 require_once('includes/conf/config.inc.php');
 require_once $configuration['paths']['filesystem'] . '/vendor/autoload.php';
 
