@@ -13,8 +13,8 @@
     }
     "auth_providers": {
         "order": ["radius"],
-        "servers": {
-            "radius": {
+        "radius": {
+            "servers": {
                 "10.1.1.1": {
                     "port": 1812,
                     "secret": "secret",

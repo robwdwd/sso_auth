@@ -8,7 +8,7 @@ if ($auth->checkLogin()) {
     exit();
 }
 
-foreach ($configuration['auth_providers']['servers']['radius'] as $hostname => $server) {
+foreach ($configuration['auth_providers']['radius']['servers'] as $hostname => $server) {
     $auth->addRadiusServer($hostname, $server['port'], $server['secret'], $server['timeout'], $server['max_tries']);
 }
 

@@ -18,6 +18,9 @@ class Auth
     private $has_error = false;
     private $error_message;
 
+    private $attributes;
+
+
     function __construct($session_encryption_key = 'eaChey8quoo1ahch0en9eebe', $session_name = 'ssoauth', $session_timeout = 3600)
     {
         $this->session_encryption_key = $session_encryption_key;
@@ -198,6 +201,27 @@ class Auth
         }
     }
 
+    private function getRadiusAttr($radius) {
+        while ($resa = radius_get_attr($radius)) {
+
+            if (!is_array($resa)) {
+                return false;
+            }
+
+            $attr = $resa['attr'];
+            $data = $resa['data'];
+
+            if ($attr == RADIUS_VENDOR_SPECIFIC) {
+                $resv = radius_get_vendor_attr($data);
+                if (is_array($resv)) {
+                    $this->attributes[RADIUS_VENDOR_SPECIFIC][] = $resv;
+                }
+            } else {
+                $this->attributes[$attr] = $data;
+            }
+        }
+    }
+
     private function loginRadius($username, $password)
     {
 
@@ -215,6 +239,7 @@ class Auth
 
         switch ($result) {
             case RADIUS_ACCESS_ACCEPT:
+                //$this->getRadiusAttr($radius);
                 return true;
                 break;
             case RADIUS_ACCESS_REJECT:
