@@ -39,29 +39,22 @@ foreach ($configuration['auth_providers']['radius']['servers'] as $hostname => $
 $errors = array();
 $form_token_key = $auth->getFormTokenKey();
 
-if (isset($_POST['username'])) {
+if (isset($_POST[$form_token_key])) {
+
     // Flag to set if an error in the form is found.
     $found_error = false;
     $twig_var_arr['found_error'] = false;
 
-    // Check the form Token is valid
-    if (!isset($_SESSION[$form_token_key])) {
-        $errors[] = "Form token not found, did you load the login page in another tab?";
+    $validator = new SSOAuth\Validate($_POST, true);
+    $validator->setFormTokenKey($form_token_key);
+    $validator->validateLogin();
+
+    if ($validator->hasError()) {
         $found_error = true;
-    } else {
-        // Check the form Token is valid
-        if ($_POST[$form_token_key] !== $_SESSION[$form_token_key]) {
-            $errors[] = "Invalid form submission: Tokens don't match";
-            $found_error = true;
-        }
+        $errors = array_merge($errors, $validator->errorMessage());
     }
 
-    // Check all fields have been filled in correctly
-    //
-    if (empty($_POST['password']) || empty($_POST['username'])) {
-        $errors[] = 'You must enter both your username and password.';
-        $found_error = true;
-    }
+    $_POST = $validator->get();
 
     if (!$found_error) {
         $auth->login($_POST['username'], $_POST['password']);
