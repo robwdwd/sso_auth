@@ -12,14 +12,6 @@ $auth = new SSOAuth\Auth(
 );
 
 if ($auth->checkLogin()) {
-    // if the user comes to the login page from another page go there.
-    if (isset($_SERVER['HTTP_X_TARGET']) && !empty($_SERVER['HTTP_X_TARGET'])) {
-        if ($_SERVER['HTTP_X_TARGET'] !== $configuration['paths']['loginurl']) {
-            header('Location: ' . $_SERVER['HTTP_X_TARGET']);
-            exit();
-        }
-    }
-
     // User has come to the login page directly, display success.
     //
     $twig_var_arr['logouturl'] = $configuration['paths']['logouturl'];
@@ -47,6 +39,7 @@ if (isset($_POST[$form_token_key])) {
 
     $validator = new SSOAuth\Validate($_POST, true);
     $validator->setFormTokenKey($form_token_key);
+
     $validator->validateLogin();
 
     if ($validator->hasError()) {
@@ -102,10 +95,12 @@ $twig_var_arr['errors'] = $errors;
 
 // Set the Target URL
 
-if (isset($_POST['target'])) {
+if (isset($_POST['target']) && !empty($_POST['target'])) {
     $twig_var_arr['x_target'] = $_POST['target'];
+} elseif (isset($_GET['url']) && !empty($_GET['url'])) {
+    $twig_var_arr['x_target'] = $_GET['url'];
 } else {
-    $twig_var_arr['x_target'] = $_SERVER['HTTP_X_TARGET'];
+    $twig_var_arr['x_target'] = $configuration['paths']['loginurl'];;
 }
 
 // Display the page
