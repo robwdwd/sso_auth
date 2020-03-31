@@ -11,8 +11,9 @@
 
     <title>{{title}} | {{company}}</title>
 
-    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/grids-responsive-min.css">
+    <link rel="stylesheet" type="text/css" href="{{urlpath}}css/pure/pure-min.css">
+    <link rel="stylesheet" type="text/css" href="{{urlpath}}css/pure/grids-responsive-min.css">
+
     <style>
         body {
             color: #555;
