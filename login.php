@@ -14,9 +14,13 @@ $auth = new SSOAuth\Auth(
 if ($auth->checkLogin()) {
     // User has come to the login page directly, display success.
     //
-    $twig_var_arr['logouturl'] = $configuration['paths']['logouturl'];
-    $template = $twig->loadTemplate('loggedin.tpl');
-    echo $template->render($twig_var_arr);
+    $template = $twig->load('loggedin.tpl');
+    echo $template->render(
+        [
+            'logouturl' => $configuration['paths']['logouturl']
+        ]
+    
+    );
     exit();
 }
 
@@ -105,5 +109,6 @@ if (isset($_POST['target']) && !empty($_POST['target'])) {
 
 // Display the page
 //
-$template = $twig->loadTemplate('login.tpl');
+
+$template = $twig->load('login.tpl');
 echo $template->render($twig_var_arr);

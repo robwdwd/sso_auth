@@ -1,12 +1,12 @@
 <?php
-
-
 require_once('includes/conf/config.inc.php');
-require_once $configuration['paths']['filesystem'] . '/vendor/autoload.php';
+require_once 'vendor/autoload.php';
 
-$loader = new Twig_Loader_Filesystem($configuration['paths']['filesystem'] . '/templates');
+$loader = new \Twig\Loader\FilesystemLoader('templates');
 
-$twig = new Twig_Environment($loader);
+$twig = new \Twig\Environment($loader, [
+    //'cache' => '/path/to/compilation_cache',
+]);
 
 $twig_var_arr = array();
 
