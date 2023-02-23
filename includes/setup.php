@@ -8,12 +8,12 @@ $twig = new \Twig\Environment($loader, [
     //'cache' => '/path/to/compilation_cache',
 ]);
 
-$twig_var_arr = array();
+$twigVars = array();
 
-$twig_var_arr['urlpath'] = $configuration['paths']['urlpath'] ;
-$twig_var_arr['full_url'] = $configuration['paths']['url'] ;
-$twig_var_arr['file_system_path'] = $configuration['paths']['filesystem'] ;
+$twigVars['urlpath'] = $configuration['paths']['urlpath'] ;
+$twigVars['full_url'] = $configuration['paths']['url'] ;
+$twigVars['file_system_path'] = $configuration['paths']['filesystem'] ;
 
-$twig_var_arr['title'] = $configuration['title'];
-$twig_var_arr['logo'] = $configuration['logo'];
-$twig_var_arr['company'] = $configuration['company'];
+$twigVars['title'] = $configuration['title'];
+$twigVars['logo'] = $configuration['logo'];
+$twigVars['company'] = $configuration['company'];

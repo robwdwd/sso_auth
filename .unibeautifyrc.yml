@@ -1,0 +1,33 @@
+JavaScript:
+  beautifiers:
+    - JS-Beautify
+  indent_char: " "
+  indent_size: 2
+  wrap_line_length: 160
+  max_preserve_newlines: 2
+  brace_style: collapse-preserve-inline
+CSS:
+  beautifiers:
+    - JS-Beautify
+  indent_char: " "
+  indent_size: 2
+  wrap_line_length: 160
+  preserve_newlines: false
+  newline_between_rules: true
+HTML:
+  indent_char: " "
+  indent_size: 4
+  wrap_line_length: 160
+  quotes: "double"
+XML:
+  indent_char: " "
+  indent_size: 4
+  wrap_line_length: 160
+Twig:
+  indent_char: " "
+  indent_size: 2
+  wrap_line_length: 160
+  max_preserve_newlines: 2
+  align_assignments: true
+JSON: false
+PHP: false

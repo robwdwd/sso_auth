@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login
+{% endblock %}
+
+{% block page_title %}Login
+{% endblock %}
+
+{% block content %}
+
+  {% if foundError %}
+    <div class="row justify-content-center">
+      <div class="col col-sm-7 col-md-5 col-lg-4">
+        <div class="alert alert-danger">
+        {% for error in errors %} {{ error }} {% endfor %}</div>
+      </div>
+    </div>
+  {% endif %}
+
+  <form method="post">
+    <input type="hidden" name="{{formTokenKey}}" value="{{form_token}}"/>
+    <input type="hidden" name="target" value="{{x_target}}"/>
+
+    <div class="row justify-content-center">
+      <div class="col col-sm-7 col-md-5 col-lg-4">
+        <div class="form-floating mb-3">
+          <input class="form-control" id="username" name="username" type="text" placeholder="Username">
+          <label for="username">Username</label>
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col col-sm-7 col-md-5 col-lg-4">
+        <div class="form-floating">
+          <input class="form-control" id="password" name="password" type="text" placeholder="Password">
+          <label for="password">Password</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col col-sm-7 col-md-5 col-lg-4">
+        <button class="btn btn-lg btn-primary mt-4" type="submit">
+          Sign in
+        </button>
+      </div>
+    </div>
+  </form>
+
+
+{% endblock %}
