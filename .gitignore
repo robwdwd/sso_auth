@@ -32,4 +32,6 @@ src/.preload.php
 .phpunit.result.cache
 ###< phpunit/phpunit ###
 
+includes/conf/config.json
+
 .vscode
