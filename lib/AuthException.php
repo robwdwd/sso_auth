@@ -1,6 +1,8 @@
 <?php
 namespace SSOAuth;
 
+use Exception;
+
 /**
  * SSO Auth exception class
  */
